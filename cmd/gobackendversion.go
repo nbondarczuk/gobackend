@@ -9,7 +9,7 @@ func main() {
 	log.Println("Started")
 
 	// for each parameter value
-	for _, kind := range [2]string{"inmem", "mysql"} {
+	for _, kind := range [3]string{"inmem", "mysql", "postgres"} {
 		printBackendVersion(kind)
 	}
 

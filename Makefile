@@ -1,9 +1,9 @@
-TARGET = gobackend
+TARGET = gobackendversion
 
 build:
-	go build -o $(TARGET)
+	go build -o $(TARGET) cmd/$(TARGET).go
 
 clean:
 	go clean
 	rm -f $(TARGET)
-	rm -f *~ 
+	find . -name "*~" -exec rm -f {} \;

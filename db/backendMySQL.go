@@ -20,6 +20,11 @@ func NewBackendMySQL(cs string) (BackendMySQL, error) {
 		return BackendMySQL{}, err
 	}
 
+	err = db.Ping()
+	if err != nil {
+		return BackendMySQL{}, err
+	}
+
 	return BackendMySQL{BackendCommonInfo{"mysql"}, cs, db}, nil
 }
 

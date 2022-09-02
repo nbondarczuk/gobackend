@@ -15,12 +15,14 @@ type Backend interface {
 	Close()
 }
 
-// NewBackend is a factory producing specific kind of backend db handlers
+// NewBackend is a factory producing specific kind of backend db handlers based on dispatch
 func NewBackend(kind string) (Backend, error) {
 	if kind == "inmem" {
 		return NewBackendInMem()
 	} else if kind == "mysql" {
 		return NewBackendMySQL(MakeConnectStringForMySQL())
+	} else if kind == "postgres" {
+		return NewBackendPostgres(MakeConnectStringForPostgres())
 	} else {
 		return nil, fmt.Errorf("Invalid kind of backend: " + kind)
 	}

@@ -3,5 +3,4 @@
 RUN="mysql -u root"
 $RUN @create_db.sql
 $RUN @create_users.sql
-$RUN @create_tables.sql
 
