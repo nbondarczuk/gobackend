@@ -1,4 +1,4 @@
-TARGET = gobackendversion
+TARGET = gobackend
 
 build:
 	go build -o $(TARGET) cmd/$(TARGET).go

@@ -1,4 +1,4 @@
-# gobackendversion
+# gobackend
 
 ## Purpose
 
@@ -20,11 +20,18 @@ The kinds of backend supported (so far):
 
 ## Description of functionality
 
+### version check
+
 The tool allows to check version of each used backend DB. The backend
 to be checked is to be used in command line parameter. It also pings
 so int can be used to check the DB engine connectivity. The version
 check is done by a very simple select operation, which in fact
 depends on the partivular DB.
+
+### ping timing
+
+The next mode of the work is to do a ping to a particular backend 
+giving out the timing.
 
 ## Configuration and usage
 

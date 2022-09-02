@@ -17,7 +17,7 @@ func main() {
 		printHelpAndExit()
 	}
 
-	// for each parameter value
+	// for each parameter value provided in the command line
 	for _, kind := range cfg.Backends2Test {
 		printBackendVersion(kind)
 	}
