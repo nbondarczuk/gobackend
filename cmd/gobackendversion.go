@@ -3,13 +3,22 @@ package main
 import (
 	"gobackend/db"
 	"log"
+	"os"
+
+	"gobackend/config"
 )
 
 func main() {
 	log.Println("Started")
 
+	cfg := config.Load()
+
+	if cfg.IsHelpReq {
+		printHelpAndExit()
+	}
+
 	// for each parameter value
-	for _, kind := range [3]string{"inmem", "mysql", "postgres"} {
+	for _, kind := range cfg.Backends2Test {
 		printBackendVersion(kind)
 	}
 
@@ -30,4 +39,9 @@ func printBackendVersion(kind string) {
 	}
 
 	log.Println("Backend", be.Kind(), "version is", version)
+}
+
+// printHelpAndfExit prints help and exits
+func printHelpAndExit() {
+	os.Exit(0)
 }
