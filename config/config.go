@@ -3,6 +3,9 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
+	"os"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -10,8 +13,9 @@ import (
 type ProcMode int
 
 const (
-	PRINT_VERSION ProcMode = 1
-	PING                   = 2
+	PRINT_VERSION    ProcMode = 1
+	PING                      = 2
+	CONFIG_FILE_NAME          = "config.yaml"
 )
 
 // Config is a ready to use, parsed structure, contrary to config from
@@ -22,24 +26,13 @@ type Config struct {
 	Backends  []string
 }
 
-type ConfigYaml struct {
-	backends Backends `yaml:"backends"`
-}
-
-type Backends struct {
-	backend []Backend `yaml:"backend"`
+type Document struct {
+	Backends []Backend `yaml:"backends"`
 }
 
 type Backend struct {
-	kind string `yaml:"kind"`
-	env  Env    `yaml:"env"`
-}
-
-type Env struct {
-	user     string `yaml:"user"`
-	password string `yaml:"password"`
-	dbname   string `yaml:"dbname"`
-	host     string `yaml:"host"`
+	Kind string            `yaml:"kind"`
+	Env  map[string]string `yaml:"env"`
 }
 
 // NewConfig create a new configuration
@@ -63,35 +56,40 @@ func (c *Config) load() error {
 
 // setInitConfig nitializes the config with initial profile
 func (c *Config) initDefaultValues() {
-	c.Mode = PING
+	c.Mode = PRINT_VERSION
 }
 
 // loadConfigFile loads the config.yaml file overriding default config
 func (c *Config) loadConfigYamlFile() error {
-	yfl, err := ioutil.ReadFile("config.yaml")
+	log.Println("Reading config file:", CONFIG_FILE_NAME)
+	yfl, err := ioutil.ReadFile(CONFIG_FILE_NAME)
 	if err != nil {
 		return err
 	}
 
-	var yc ConfigYaml
-	err = yaml.Unmarshal(yfl, &yc)
+	var doc Document
+	log.Println("Parsing config file:", CONFIG_FILE_NAME)
+	err = yaml.Unmarshal(yfl, &doc)
 	if err != nil {
 		return err
 	}
 
-	// all side effects are stored in env variables
-	for _, backend := range yc.backends.backend {
-		c.Backends = append(c.Backends, backend.kind)
-		c.setEnvVars(backend.kind, backend.env)
+	for _, backend := range doc.Backends {
+		c.setEnvVars(backend.Kind, backend.Env)
 	}
 
 	return nil
 }
 
-// loadEnvVars overrides the default values from config with the env
-func (c *Config) setEnvVars(kind string, env Env) error {
-	fmt.Printf("%+v", env)
-	return nil
+// setEnvVars overrides the default values from config with the env
+func (c *Config) setEnvVars(kind string, env map[string]string) {
+	c.Backends = append(c.Backends, kind)
+	log.Printf("Using backend: %s -> %+v\n", kind, env)
+	for key, value := range env {
+		name := fmt.Sprintf("%s_%s", strings.ToUpper(kind), strings.ToUpper(key))
+		os.Setenv(name, value)
+		log.Printf("Add env variable: %s = %s\n", name, value)
+	}
 }
 
 // loadCmdArgvs overrides config with command line switches

@@ -6,6 +6,10 @@ type BackendInMem struct {
 
 type BackendCredentialsInMem struct{}
 
+func (bc BackendCredentialsInMem) ConnectString() string {
+	return ""
+}
+
 func NewBackendInMem() (BackendInMem, error) {
 	return BackendInMem{kind: "inmem"}, nil
 }

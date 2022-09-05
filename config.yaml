@@ -1,13 +1,14 @@
 backends:
-	backend:
-		kind: mysql
-		env:
-			- user: sysrun
-			- password: sysrun
-			- dbname: db1
-	backend:
-		kind: postgres
-		env:
-			- user: sysrun
-			- password: sysrun
-			- dbname: db1
+- mysql:
+  kind: mysql
+  env:
+    user: sysrun
+    password: sysrun
+    dbnme: db1
+- postgres:
+  kind: postgres
+  env:
+    user: sysrun
+    password: sysrun
+    dbnme: db1	
+    host: localhost

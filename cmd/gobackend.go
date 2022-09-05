@@ -24,9 +24,9 @@ func main() {
 	}
 
 	// for each parameter value provided in the command line
-	for _, kind := range cfg.Backends {
-		procBackend(kind, cfg.Mode)
-	}
+	//for _, kind := range cfg.Backends {
+	//	procBackend(kind, cfg.Mode)
+	//}
 
 	log.Println("Finished")
 }

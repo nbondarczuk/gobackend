@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 
+	"gobackend/backend/inmem"
 	"gobackend/backend/mysql"
 	"gobackend/backend/postgres"
 )
@@ -43,7 +44,7 @@ func NewBackend(kind string) (Backend, error) {
 
 	switch kind {
 	case "inmem":
-		return nil, nil
+		return inmem.NewBackendInMem()
 	case "mysql":
 		return mysql.NewBackendMySQL(bc.(mysql.BackendCredentialsMySQL))
 	case "postgres":

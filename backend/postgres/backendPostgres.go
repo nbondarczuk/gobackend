@@ -19,6 +19,7 @@ type BackendCredentialsPostgres struct {
 	user, password, dbname, host string
 }
 
+// NewBackendCredentialsPostgres build an interfane respresentation of a connect string
 func NewBackendCredentialsPostgres() (BackendCredentialsPostgres, error) {
 	return BackendCredentialsPostgres{
 			user:     os.Getenv("POSTGRES_USER"),
@@ -29,8 +30,11 @@ func NewBackendCredentialsPostgres() (BackendCredentialsPostgres, error) {
 		nil
 }
 
+// ConnectString produces the external respresentation of the connect string
+// to be use in the DB connection
 func (bc BackendCredentialsPostgres) ConnectString() string {
-	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", bc.host, bc.user, bc.password, bc.dbname)
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+		bc.host, bc.user, bc.password, bc.dbname)
 }
 
 // NewBackendPostgres creates and opens new Postgres DB connection

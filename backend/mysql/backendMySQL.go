@@ -19,6 +19,7 @@ type BackendCredentialsMySQL struct {
 	user, password, dbname string
 }
 
+// NewBackendCredentialsMySQL build an interfane respresentation of a connect string
 func NewBackendCredentialsMySQL() (BackendCredentialsMySQL, error) {
 	return BackendCredentialsMySQL{
 			user:     os.Getenv("MYSQL_USER"),
@@ -28,6 +29,8 @@ func NewBackendCredentialsMySQL() (BackendCredentialsMySQL, error) {
 		nil
 }
 
+// ConnectString produces the external respresentation of the connect string
+// to be use in the DB connection
 func (bc BackendCredentialsMySQL) ConnectString() string {
 	return fmt.Sprintf("%s:%s@/%s", bc.user, bc.password, bc.dbname)
 }
