@@ -14,8 +14,8 @@ The kinds of backend supported (so far):
 - MySQL 
 - Postgres
 - Oracle
-- ETCD
 - Mongo DB
+- Redis
 - Dynamo DB
 
 ## Description of functionality
