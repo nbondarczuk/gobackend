@@ -1,7 +1,9 @@
-package db
+package backend
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -13,14 +15,27 @@ type BackendMySQL struct {
 	db *sql.DB
 }
 
-// NewBackendMySQL creates and opens new MySQL DB connection
-func NewBackendMySQL(cs string) (BackendMySQL, error) {
-	db, err := sql.Open("mysql", cs)
-	if err != nil {
-		return BackendMySQL{}, err
-	}
+type BackendCredentialsMySQL struct {
+	user, password, dbname string
+}
 
-	err = db.Ping()
+func NewBackendCredentialsMySQL() (BackendCredentials, error) {
+	return BackendCredentialsMySQL{
+			user:     os.Getenv("MYSQL_USER"),
+			password: os.Getenv("MYSQL_PASSWORD"),
+			dbname:   os.Getenv("MYSQL_DBNAME"),
+		},
+		nil
+}
+
+func (bc BackendCredentialsMySQL) ConnectString() string {
+	return fmt.Sprintf("%s:%s@/%s", bc.user, bc.password, bc.dbname)
+}
+
+// NewBackendMySQL creates and opens new MySQL DB connection
+func NewBackendMySQL(bc BackendCredentials) (BackendMySQL, error) {
+	cs := bc.ConnectString()
+	db, err := sql.Open("mysql", cs)
 	if err != nil {
 		return BackendMySQL{}, err
 	}
@@ -42,6 +57,16 @@ func (be BackendMySQL) Version() (string, error) {
 	}
 
 	return version, nil
+}
+
+// Ping backend db
+func (be BackendMySQL) Ping() error {
+	err := be.db.Ping()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Close backend connection

@@ -1,7 +1,9 @@
-package db
+package backend
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
 
 	_ "github.com/lib/pq" // add this
 )
@@ -13,14 +15,28 @@ type BackendPostgres struct {
 	db *sql.DB
 }
 
-// NewBackendPostgres creates and opens new Postgres DB connection
-func NewBackendPostgres(cs string) (BackendPostgres, error) {
-	db, err := sql.Open("postgres", cs)
-	if err != nil {
-		return BackendPostgres{}, err
-	}
+type BackendCredentialsPostgres struct {
+	user, password, dbname, host string
+}
 
-	err = db.Ping()
+func NewBackendCredentialsPostgres() (BackendCredentials, error) {
+	return BackendCredentialsPostgres{
+			user:     os.Getenv("POSTGRES_USER"),
+			password: os.Getenv("POSTGRES_PASSWORD"),
+			dbname:   os.Getenv("POSTGRES_DBNAME"),
+			host:     os.Getenv("POSTGRES_HOST"),
+		},
+		nil
+}
+
+func (bc BackendCredentialsPostgres) ConnectString() string {
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", bc.host, bc.user, bc.password, bc.dbname)
+}
+
+// NewBackendPostgres creates and opens new Postgres DB connection
+func NewBackendPostgres(bc BackendCredentials) (BackendPostgres, error) {
+	cs := bc.ConnectString()
+	db, err := sql.Open("postgres", cs)
 	if err != nil {
 		return BackendPostgres{}, err
 	}
@@ -42,6 +58,16 @@ func (be BackendPostgres) Version() (string, error) {
 	}
 
 	return version, nil
+}
+
+// Close backend connection
+func (be BackendPostgres) Ping() error {
+	err := be.db.Ping()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Close backend connection

@@ -1,8 +1,16 @@
 package config
 
+type ProcMode int
+
+const (
+	PRINT_VERSION ProcMode = 1
+	PING                   = 2
+)
+
 type Config struct {
-	IsHelpReq     bool
-	Backends2Test []string
+	IsHelpReq bool
+	Mode      ProcMode
+	Backends  []string
 }
 
 var cnf Config
@@ -18,13 +26,15 @@ func Load() Config {
 }
 
 // setInitConfig nitializes the config with initial profile
-func setInitConfig() {}
+func setInitConfig() {
+	cnf.Mode = PING
+	cnf.Backends = []string{"mysql", "postgres"}
+}
 
 // loadConfigFile loads the config.yaml file overriding default config
 func loadConfigFile() {}
 
 // loadEnvVars checks for env variables overriding file config
-
 func loadEnvVars() {}
 
 // loadCmdArgvs overrides config with command line switches
