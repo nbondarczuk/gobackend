@@ -1,25 +1,25 @@
-package backend
+package postgres
 
 import (
 	"database/sql"
 	"fmt"
 	"os"
 
-	_ "github.com/lib/pq" // add this
+	_ "github.com/lib/pq"
 )
 
 // Backend for Postgres DB
 type BackendPostgres struct {
-	BackendCommonInfo
-	cs string
-	db *sql.DB
+	kind string
+	cs   string
+	db   *sql.DB
 }
 
 type BackendCredentialsPostgres struct {
 	user, password, dbname, host string
 }
 
-func NewBackendCredentialsPostgres() (BackendCredentials, error) {
+func NewBackendCredentialsPostgres() (BackendCredentialsPostgres, error) {
 	return BackendCredentialsPostgres{
 			user:     os.Getenv("POSTGRES_USER"),
 			password: os.Getenv("POSTGRES_PASSWORD"),
@@ -34,14 +34,14 @@ func (bc BackendCredentialsPostgres) ConnectString() string {
 }
 
 // NewBackendPostgres creates and opens new Postgres DB connection
-func NewBackendPostgres(bc BackendCredentials) (BackendPostgres, error) {
+func NewBackendPostgres(bc BackendCredentialsPostgres) (BackendPostgres, error) {
 	cs := bc.ConnectString()
 	db, err := sql.Open("postgres", cs)
 	if err != nil {
 		return BackendPostgres{}, err
 	}
 
-	return BackendPostgres{BackendCommonInfo{"mysql"}, cs, db}, nil
+	return BackendPostgres{"mysql", cs, db}, nil
 }
 
 // Kind return what kind of backend db is used

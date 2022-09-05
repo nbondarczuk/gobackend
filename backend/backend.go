@@ -2,11 +2,10 @@ package backend
 
 import (
 	"fmt"
-)
 
-type BackendCommonInfo struct {
-	kind string
-}
+	"gobackend/backend/mysql"
+	"gobackend/backend/postgres"
+)
 
 // Backend is an interface providing access to specific kind of db if needed
 type Backend interface {
@@ -27,9 +26,9 @@ func NewBackendCredentials(kind string) (BackendCredentials, error) {
 	case "inmem":
 		return nil, nil
 	case "mysql":
-		return NewBackendCredentialsMySQL()
+		return mysql.NewBackendCredentialsMySQL()
 	case "postgres":
-		return NewBackendCredentialsPostgres()
+		return postgres.NewBackendCredentialsPostgres()
 	}
 
 	return nil, fmt.Errorf("Invalid kind of backend: " + kind)
@@ -46,9 +45,9 @@ func NewBackend(kind string) (Backend, error) {
 	case "inmem":
 		return nil, nil
 	case "mysql":
-		return NewBackendMySQL(bc)
+		return mysql.NewBackendMySQL(bc.(mysql.BackendCredentialsMySQL))
 	case "postgres":
-		return NewBackendPostgres(bc)
+		return postgres.NewBackendPostgres(bc.(postgres.BackendCredentialsPostgres))
 	}
 
 	return nil, fmt.Errorf("Invalid kind of backend: " + kind)

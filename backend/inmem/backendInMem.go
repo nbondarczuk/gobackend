@@ -1,13 +1,13 @@
-package backend
+package inmem
 
 type BackendInMem struct {
-	BackendCommonInfo
+	kind string
 }
 
 type BackendCredentialsInMem struct{}
 
 func NewBackendInMem() (BackendInMem, error) {
-	return BackendInMem{BackendCommonInfo{"inmem"}}, nil
+	return BackendInMem{kind: "inmem"}, nil
 }
 
 func (be BackendInMem) Kind() string {

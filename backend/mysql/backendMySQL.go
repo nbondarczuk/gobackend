@@ -1,4 +1,4 @@
-package backend
+package mysql
 
 import (
 	"database/sql"
@@ -10,16 +10,16 @@ import (
 
 // Backend for MySQL DB
 type BackendMySQL struct {
-	BackendCommonInfo
-	cs string
-	db *sql.DB
+	kind string
+	cs   string
+	db   *sql.DB
 }
 
 type BackendCredentialsMySQL struct {
 	user, password, dbname string
 }
 
-func NewBackendCredentialsMySQL() (BackendCredentials, error) {
+func NewBackendCredentialsMySQL() (BackendCredentialsMySQL, error) {
 	return BackendCredentialsMySQL{
 			user:     os.Getenv("MYSQL_USER"),
 			password: os.Getenv("MYSQL_PASSWORD"),
@@ -33,14 +33,14 @@ func (bc BackendCredentialsMySQL) ConnectString() string {
 }
 
 // NewBackendMySQL creates and opens new MySQL DB connection
-func NewBackendMySQL(bc BackendCredentials) (BackendMySQL, error) {
+func NewBackendMySQL(bc BackendCredentialsMySQL) (BackendMySQL, error) {
 	cs := bc.ConnectString()
 	db, err := sql.Open("mysql", cs)
 	if err != nil {
 		return BackendMySQL{}, err
 	}
 
-	return BackendMySQL{BackendCommonInfo{"mysql"}, cs, db}, nil
+	return BackendMySQL{"mysql", cs, db}, nil
 }
 
 // Kind return what kind of backend db is used
