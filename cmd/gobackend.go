@@ -8,18 +8,24 @@ import (
 	"gobackend/config"
 )
 
+var cfg *config.Config
+
 // main load config and does something with each backend requested
 func main() {
 	log.Println("Started")
 
-	cnf := config.Load()
-	if cnf.IsHelpReq {
+	cfg, err := config.NewConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	if cfg.IsHelpReq {
 		printHelpAndExit()
 	}
 
 	// for each parameter value provided in the command line
-	for _, kind := range cnf.Backends {
-		procBackend(kind, cnf.Mode)
+	for _, kind := range cfg.Backends {
+		procBackend(kind, cfg.Mode)
 	}
 
 	log.Println("Finished")
