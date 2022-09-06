@@ -14,10 +14,7 @@ var cfg *config.Config
 func main() {
 	log.Println("Started")
 
-	cfg, err := config.NewConfig()
-	if err != nil {
-		panic(err)
-	}
+	LoadConfig()
 
 	if cfg.IsHelpReq {
 		printHelpAndExit()
@@ -29,6 +26,18 @@ func main() {
 	//}
 
 	log.Println("Finished")
+}
+
+// LoadConfig gets the contents of file and uses it to make a config
+func LoadConfig() {
+	input, err := config.ConfigYamlFromFile()
+	if err != nil {
+		panic(err)
+	}
+	cfg, err = config.NewConfig(input)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // procBackend creates connection and uses backend to do something

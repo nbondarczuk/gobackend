@@ -35,21 +35,39 @@ type Backend struct {
 	Env  map[string]string `yaml:"env"`
 }
 
+// ConfigYamlFromFile gets the contents of the config file
+func ConfigYamlFromFile() ([]byte, error) {
+	log.Println("Reading config file:", CONFIG_FILE_NAME)
+	input, err := ioutil.ReadFile(CONFIG_FILE_NAME)
+	if err != nil {
+		return nil, err
+	}
+
+	return input, nil
+}
+
+// Config is a Stringer (implicitely)
+func (c *Config) String() string {
+	return fmt.Sprintf("%T%+v", *c, *c)
+}
+
 // NewConfig create a new configuration
-func NewConfig() (*Config, error) {
+func NewConfig(input []byte) (*Config, error) {
 	c := &Config{Mode: PING}
-	err := c.load()
+	err := c.load(input)
+	log.Printf("Loaded: %s\n", c.String())
+
 	return c, err
 }
 
 // Get config from files (if exist), env vars (if found) and command line (if used)
-func (c *Config) load() error {
+func (c *Config) load(input []byte) error {
 	c.initDefaultValues()
-	err := c.loadConfigYamlFile()
+	err := c.loadConfigYaml(input)
 	if err != nil {
 		return err
 	}
-	c.loadCmdArgvs()
+	c.loadCmdLineArgs()
 
 	return nil
 }
@@ -60,16 +78,10 @@ func (c *Config) initDefaultValues() {
 }
 
 // loadConfigFile loads the config.yaml file overriding default config
-func (c *Config) loadConfigYamlFile() error {
-	log.Println("Reading config file:", CONFIG_FILE_NAME)
-	yfl, err := ioutil.ReadFile(CONFIG_FILE_NAME)
-	if err != nil {
-		return err
-	}
-
+func (c *Config) loadConfigYaml(input []byte) error {
 	var doc Document
 	log.Println("Parsing config file:", CONFIG_FILE_NAME)
-	err = yaml.Unmarshal(yfl, &doc)
+	err := yaml.Unmarshal(input, &doc)
 	if err != nil {
 		return err
 	}
@@ -93,4 +105,4 @@ func (c *Config) setEnvVars(kind string, env map[string]string) {
 }
 
 // loadCmdArgvs overrides config with command line switches
-func (c *Config) loadCmdArgvs() {}
+func (c *Config) loadCmdLineArgs() {}
