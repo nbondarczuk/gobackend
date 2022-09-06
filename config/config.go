@@ -35,7 +35,7 @@ type Backend struct {
 	Env  map[string]string `yaml:"env"`
 }
 
-// ConfigYamlFromFile gets the contents of the config file
+// ConfigYamlFromFile gets the contents of the config file.
 func ConfigYamlFromFile() ([]byte, error) {
 	log.Println("Reading config file:", CONFIG_FILE_NAME)
 	input, err := ioutil.ReadFile(CONFIG_FILE_NAME)
@@ -46,12 +46,12 @@ func ConfigYamlFromFile() ([]byte, error) {
 	return input, nil
 }
 
-// Config is a Stringer (implicitely)
+// String makes Config a Stringer (implicitely).
 func (c *Config) String() string {
 	return fmt.Sprintf("%T%+v", *c, *c)
 }
 
-// NewConfig create a new configuration
+// NewConfig create a new configuration.
 func NewConfig(input []byte) (*Config, error) {
 	c := &Config{Mode: PING}
 	err := c.load(input)
@@ -60,24 +60,23 @@ func NewConfig(input []byte) (*Config, error) {
 	return c, err
 }
 
-// Get config from files (if exist), env vars (if found) and command line (if used)
+// load gets config from file, env vars (if found) and command line (if used).
 func (c *Config) load(input []byte) error {
 	c.initDefaultValues()
 	err := c.loadConfigYaml(input)
 	if err != nil {
 		return err
 	}
-	c.loadCmdLineArgs()
 
 	return nil
 }
 
-// setInitConfig nitializes the config with initial profile
+// setInitConfig nitializes the config with initial profile.
 func (c *Config) initDefaultValues() {
 	c.Mode = PRINT_VERSION
 }
 
-// loadConfigFile loads the config.yaml file overriding default config
+// loadConfigFile loads the config.yaml file overriding default config.
 func (c *Config) loadConfigYaml(input []byte) error {
 	var doc Document
 	log.Println("Parsing config file:", CONFIG_FILE_NAME)
@@ -93,16 +92,30 @@ func (c *Config) loadConfigYaml(input []byte) error {
 	return nil
 }
 
-// setEnvVars overrides the default values from config with the env
+// setEnvVars overrides the default values from config with the env.
 func (c *Config) setEnvVars(kind string, env map[string]string) {
 	c.Backends = append(c.Backends, kind)
 	log.Printf("Using backend: %s -> %+v\n", kind, env)
-	for key, value := range env {
-		name := fmt.Sprintf("%s_%s", strings.ToUpper(kind), strings.ToUpper(key))
-		os.Setenv(name, value)
-		log.Printf("Add env variable: %s = %s\n", name, value)
+	for key, envval := range env {
+		// Add new env var.
+		envvar := fmt.Sprintf("%s_%s", strings.ToUpper(kind), strings.ToUpper(key))
+		// First use existing env var values, then config, then command line vars.
+		if os.Getenv(envvar) == "" {
+			flg := fmt.Sprintf("%s_%s", strings.ToLower(kind), strings.ToLower(key))
+			flgval := checkFlagUsage(flg)
+			if flgval == "" {
+				os.Setenv(envvar, envval)
+				log.Printf("Use cnf variable: %s = %s\n", envvar, envval)
+			} else {
+				os.Setenv(envvar, flgval)
+				log.Printf("Use flg variable: %s = %s\n", envvar, envval)
+			}
+		} else {
+			log.Printf("Use env variable: %s = %s\n", envvar, os.Getenv(envvar))
+		}
 	}
 }
 
-// loadCmdArgvs overrides config with command line switches
-func (c *Config) loadCmdLineArgs() {}
+func checkFlagUsage(flg string) string {
+	return ""
+}

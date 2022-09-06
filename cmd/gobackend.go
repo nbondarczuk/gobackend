@@ -14,7 +14,7 @@ var cfg *config.Config
 func main() {
 	log.Println("Started")
 
-	LoadConfig()
+	loadConfig()
 
 	if cfg.IsHelpReq {
 		printHelpAndExit()
@@ -29,7 +29,7 @@ func main() {
 }
 
 // LoadConfig gets the contents of file and uses it to make a config
-func LoadConfig() {
+func loadConfig() {
 	input, err := config.ConfigYamlFromFile()
 	if err != nil {
 		panic(err)

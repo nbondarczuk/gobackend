@@ -10,5 +10,5 @@ backends:
   env:
     user: sysrun
     password: sysrun
-    dbnme: db1	
+    dbname: db1	
     host: localhost
